@@ -2,287 +2,752 @@
 <html lang="ur" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MI ADMIN V2 | DIGITAL SUPREMACY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MI SYSTEM V2.1 | SUPREME CONTROL CENTER</title>
+    
+    <meta name="theme-color" content="#020205">
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00f2ff">
-<link rel="apple-touch-icon" href="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png">
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('MI PWA: Registered Success!', reg))
-        .catch(err => console.log('MI PWA: Register Failed!', err));
-    });
-  }
-</script>
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png">
 
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* ==========================================
-           ADVANCED NEON THEME & UI ENGINE
-           ========================================== */
+        /* ==========================================================================
+           CSS ENGINE: STYLING & RESPONSIVE DESIGN (Design aur mobile setting)
+           ========================================================================== */
+        
+        /* Variables (Makhsoos colors jo hum baar baar use karenge) */
         :root {
             --neon-cyan: #00f2ff;
             --neon-mag: #bc13fe;
             --neon-red: #ff0055;
             --neon-green: #00ff9d;
+            --neon-gold: #ffd700;
             --bg-deep: #020205;
             --glass-bg: rgba(10, 10, 18, 0.85);
-            --glass-border: rgba(0, 242, 255, 0.15);
+            --glass-border: rgba(0, 242, 255, 0.2);
+            --danger-bg: rgba(255, 0, 85, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Basic Reset (Pehle se majood spacing khatam karna) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-cyan) transparent;
+        }
+
+        /* Custom Scrollbar (Scroll karne wali line ka design) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 10px; }
+
+        /* Body Styling (Puri website ka background) */
         body {
             background-color: var(--bg-deep);
             color: #e0e0e0;
             font-family: 'Poppins', sans-serif;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 0% 0%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+                radial-gradient(circle at 10% 10%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(188, 19, 254, 0.05) 0%, transparent 40%);
+            overscroll-behavior-y: none; /* Stops pull-to-refresh on mobile */
         }
 
-        /* --- LOGIC: DIGITAL GRID BACKGROUND --- */
+        /* Digital Cyber Grid Pattern */
         body::before {
-            content: ""; position: fixed; inset: 0;
+            content: "";
+            position: fixed;
+            inset: 0;
             background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px; z-index: -1; pointer-events: none;
+            background-size: 30px 30px;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* --- 1. SUPREME LOCK SCREEN --- */
-        #admin-lock-screen {
-            position: fixed; inset: 0; background: #000; z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .lock-container {
-            background: var(--glass-bg); padding: 50px; border-radius: 25px;
-            border: 1px solid var(--neon-cyan); text-align: center;
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2); backdrop-filter: blur(20px);
-        }
-        .lock-logo { width: 100px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon-cyan)); }
-        .pin-field {
-            background: #000; border: 2px solid var(--neon-mag); padding: 18px;
-            border-radius: 12px; color: var(--neon-cyan); font-size: 28px;
-            text-align: center; letter-spacing: 12px; width: 250px; outline: none; margin: 25px 0;
-            font-family: 'Orbitron', sans-serif; transition: 0.3s;
-        }
-        .pin-field:focus { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan); }
+        /* Typography (Likhai ke styles) */
+        h1, h2, h3, h4 { font-family: 'Orbitron', sans-serif; }
+        .mono { font-family: 'Roboto Mono', monospace; }
 
-        /* --- 2. DASHBOARD ANIMATIONS --- */
-        #admin-dashboard { display: none; padding: 25px; opacity: 0; }
+        /* ==========================================================================
+           1. LOGIN SECURITY SCREEN (Multi-Admin Login)
+           ========================================================================== */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glow animation for logo */
+        @keyframes masterGlow {
+            0% { filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+            100% { filter: drop-shadow(0 0 25px var(--neon-cyan)); }
+        }
+
+        .login-logo {
+            width: 100px;
+            margin-bottom: 20px;
+            animation: masterGlow 2s infinite alternate;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 10px;
+            font-family: 'Poppins';
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+
+        .pin-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .pin-box {
+            width: 100%;
+            padding: 15px;
+            background: #000;
+            border: 2px solid var(--neon-mag);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron';
+            font-size: 24px;
+            text-align: center;
+            border-radius: 10px;
+            letter-spacing: 15px;
+            outline: none;
+        }
+
+        /* Buttons (Batan ki styling) */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron';
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:active { transform: scale(0.95); } /* Haptic visual feedback */
+
+        .btn-cyan { background: var(--neon-cyan); color: #000; box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4); }
+        .btn-mag { background: var(--neon-mag); color: #fff; box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4); }
+        .btn-red { background: var(--neon-red); color: #fff; box-shadow: 0 5px 20px rgba(255, 0, 85, 0.4); }
         
-        .header-main {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 25px; background: var(--glass-bg); border-radius: 20px;
-            border-left: 5px solid var(--neon-cyan); margin-bottom: 35px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .header-title h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; letter-spacing: 3px; }
+        .btn-cyan:hover { background: #fff; color: #000; box-shadow: 0 5px 30px rgba(0, 242, 255, 0.6); }
 
-        /* --- 3. GRID & CARDS --- */
-        .admin-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px; margin-bottom: 50px;
+        /* ==========================================================================
+           2. MAIN DASHBOARD LAYOUT (Asal Control Panel)
+           ========================================================================== */
+        #dashboard {
+            display: none; /* Pehle chhupa hoga, login ke baad dikhega */
+            opacity: 0;
+            padding: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border-bottom: 3px solid var(--neon-cyan);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .nav-brand h1 {
+            font-size: 18px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-badge {
+            background: var(--neon-mag);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-family: 'Poppins';
+        }
+
+        .nav-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item { text-align: right; }
+        .stat-item span { font-size: 10px; color: #888; display: block; }
+        .stat-item b { font-size: 16px; color: var(--neon-cyan); font-family: 'Orbitron'; }
+
+        /* Grid System (Mobile aur PC dono ke liye) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
         }
 
         .card {
-            background: var(--glass-bg); border-radius: 20px; padding: 30px;
-            border: 1px solid var(--glass-border); transition: 0.4s;
-            position: relative; overflow: hidden;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
         }
-        .card:hover { border-color: var(--neon-cyan); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 242, 255, 0.1); }
-        .card h2 { font-size: 16px; color: var(--neon-cyan); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        
+        .card:hover { border-color: var(--neon-cyan); }
 
-        /* --- 4. FORM ELEMENTS --- */
-        .field-group { margin-bottom: 20px; }
-        label { font-size: 11px; color: #888; margin-bottom: 8px; display: block; text-transform: uppercase; font-weight: 700; }
-        input, textarea, select {
-            width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid #222;
-            border-radius: 10px; color: #fff; outline: none; transition: 0.3s; font-size: 14px;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
         }
-        input:focus, textarea:focus { border-color: var(--neon-cyan); background: rgba(0,0,0,0.8); }
 
-        .btn-glow {
-            width: 100%; padding: 15px; border: none; border-radius: 10px;
-            font-weight: 900; letter-spacing: 2px; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px;
+        .card-header h2 {
+            font-size: 16px;
+            color: var(--neon-cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .btn-cyan { background: var(--neon-cyan); color: #000; box-shadow: 0 5px 15px rgba(0, 242, 255, 0.3); }
-        .btn-mag { background: var(--neon-mag); color: #fff; box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
-        .btn-cyan:hover, .btn-mag:hover { filter: brightness(1.2); letter-spacing: 4px; }
 
-        /* --- 5. CONTENT MANAGER (Delete System) --- */
-        .content-list { max-height: 300px; overflow-y: auto; padding-right: 10px; }
-        .list-item {
-            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid transparent; transition: 0.3s;
-        }
-        .list-item:hover { background: rgba(255,255,255,0.07); border-color: #333; }
-        .item-info h4 { font-size: 13px; color: var(--neon-cyan); }
-        .item-info p { font-size: 11px; color: #777; }
-        .del-btn { color: var(--neon-red); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; }
+        /* Responsive Columns */
+        .col-4 { grid-column: span 4; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
 
-        /* --- 6. ADMIN CHAT HUB --- */
-        #admin-chat-area {
-            height: 400px; overflow-y: auto; background: rgba(0,0,0,0.3);
-            border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px inset #111;
+        @media (max-width: 992px) {
+            .col-4, .col-8, .col-6 { grid-column: span 12; }
+            .top-nav { flex-direction: column; gap: 15px; align-items: stretch; }
+            .nav-stats { justify-content: space-between; }
         }
-        .admin-chat-msg { margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #111; padding-bottom: 5px; }
-        .admin-chat-msg b { color: var(--neon-mag); }
 
-        /* --- 7. NOTIFICATION TOAST --- */
-        #notify {
-            position: fixed; bottom: 30px; right: 30px; padding: 15px 30px;
-            border-radius: 12px; background: var(--neon-green); color: #000;
-            font-weight: 800; transform: translateY(150%); transition: 0.5s; z-index: 100000;
+        /* ==========================================================================
+           3. FORM INPUTS & MAGIC ELEMENTS
+           ========================================================================== */
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-family: 'Poppins';
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--neon-mag);
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.2);
+        }
+
+        textarea.form-control { resize: vertical; min-height: 80px; }
+
+        /* Datetime picker custom styling */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) hue-rotate(180deg);
+            cursor: pointer;
+        }
+
+        /* ==========================================================================
+           4. POLL LIST & LIVE TIMER MAGIC
+           ========================================================================== */
+        .poll-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Pulse Animation for expiring polls */
+        @keyframes urgentPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.4); border-color: var(--neon-red); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 0, 85, 0); border-color: #333; }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); border-color: var(--neon-red); }
+        }
+
+        .poll-item {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .poll-item.urgent { animation: urgentPulse 2s infinite; }
+        .poll-item.closed { border-color: #555; opacity: 0.7; }
+
+        .poll-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .poll-title { font-size: 15px; color: #fff; font-weight: 700; }
+        .poll-desc { font-size: 11px; color: #888; margin-top: 5px; }
+        
+        .timer-badge {
+            background: #111;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-family: 'Roboto Mono';
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .timer-badge.ending { color: var(--neon-red); border-color: var(--neon-red); }
+
+        .vs-counters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .counter-box {
+            flex: 1;
+            background: #000;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Progress Bar Background */
+        .progress-bg {
+            position: absolute;
+            bottom: 0; left: 0; height: 3px;
+            background: var(--neon-cyan);
+            width: 0%;
+            transition: width 1s ease-out;
+        }
+
+        .counter-box.opt-b .progress-bg { background: var(--neon-mag); }
+
+        .counter-name { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; }
+        .counter-val { font-size: 24px; color: #fff; font-family: 'Orbitron'; font-weight: 900; }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+        }
+        
+        .icon-btn {
+            background: none; border: none; color: #888; cursor: pointer;
+            font-size: 14px; transition: 0.3s; padding: 5px;
+        }
+        .icon-btn:hover { color: #fff; transform: scale(1.2); }
+        .icon-btn.edit:hover { color: var(--neon-cyan); }
+        .icon-btn.delete:hover { color: var(--neon-red); }
+
+        /* ==========================================================================
+           5. INTEGRITY LOG (Users & Votes Table)
+           ========================================================================== */
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap; /* Txt line break na ho */
+        }
+
+        th {
+            background: #111;
+            color: var(--neon-gold);
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-family: 'Orbitron';
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #222;
+            color: #ddd;
+        }
+
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .tag-user { font-weight: bold; color: #fff; }
+        .tag-uid { font-family: 'Roboto Mono'; font-size: 10px; color: #666; }
+        .tag-vote { background: rgba(0, 242, 255, 0.1); color: var(--neon-cyan); padding: 3px 8px; border-radius: 5px; }
+        .tag-time { font-family: 'Roboto Mono'; color: #888; }
+
+        /* ==========================================================================
+           6. LIVE CHAT HUB (Admin Control)
+           ========================================================================== */
+        .chat-box {
+            background: #000;
+            border: 1px solid #222;
+            border-radius: 10px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-msg {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .chat-msg.admin-msg {
+            background: rgba(188, 19, 254, 0.1);
+            border-left: 3px solid var(--neon-mag);
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .chat-sender { font-weight: bold; color: var(--neon-cyan); }
+        .admin-msg .chat-sender { color: var(--neon-mag); }
+        
+        .chat-text { font-size: 13px; color: #fff; word-break: break-word; }
+
+        .chat-del {
+            position: absolute; right: 10px; top: 10px;
+            color: var(--neon-red); background: none; border: none; cursor: pointer;
+            opacity: 0; transition: 0.3s;
+        }
+        .chat-msg:hover .chat-del { opacity: 1; }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* ==========================================================================
+           7. UNIVERSAL MODALS (Popup windows for editing)
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px); z-index: 100000;
+            display: none; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-deep); border: 1px solid var(--neon-cyan);
+            border-radius: 20px; padding: 30px; width: 100%; max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.2);
+            transform: scale(0.9); opacity: 0; transition: 0.3s;
+        }
+
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
+
+        .modal-close {
+            float: right; background: none; border: none; color: #888;
+            font-size: 20px; cursor: pointer;
+        }
+
+        /* ==========================================================================
+           8. TOAST NOTIFICATIONS (Chote alerts)
+           ========================================================================== */
+        #toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 999999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        
+        .toast {
+            background: var(--glass-bg); border-left: 4px solid var(--neon-green);
+            color: #fff; padding: 15px 25px; border-radius: 8px; font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-size: 12px;
+            transform: translateX(120%); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-color: var(--neon-red); }
 
     </style>
 </head>
 <body>
 
-    <div id="admin-lock-screen">
-        <div class="lock-container">
-            <img src="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png" class="lock-logo" alt="MI">
-            <h1 style="font-family: 'Orbitron'; font-size: 24px; color: #fff;">MI SYSTEM LOCK</h1>
-            <p style="font-size: 11px; color: var(--neon-cyan); margin-top: 10px;">AUTHORIZED PERSONNEL ONLY</p>
-            <input type="password" id="pin-input" class="pin-field" maxlength="6" placeholder="******">
-            <button class="btn-glow btn-cyan" onclick="unlockAdmin()">IDENTITY VERIFIED</button>
+    <audio id="sound-success" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+    <audio id="sound-error" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="sound-tick" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sound-win" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png" alt="MI Logo" class="login-logo">
+            <h2 style="color: #fff; margin-bottom: 5px;">MI SYSTEM V2.1</h2>
+            <p style="color: var(--neon-cyan); font-size: 11px; margin-bottom: 25px; letter-spacing: 2px;">SUPREME ACCESS REQUIRED</p>
+            
+            <input type="text" id="auth-user" class="auth-input" placeholder="Admin Username (e.g., Maaz)">
+            <input type="password" id="auth-pass" class="auth-input" placeholder="Master Password">
+            
+            <input type="password" id="auth-pin" class="pin-box" maxlength="6" placeholder="******" pattern="\d*">
+            
+            <button class="btn btn-cyan" onclick="verifyAdmin()" style="margin-top: 10px;">
+                <i class="fas fa-fingerprint"></i> VERIFY IDENTITY
+            </button>
         </div>
     </div>
 
-    <div id="admin-dashboard">
+    <div id="dashboard">
         
-        <header class="header-main">
-            <div class="header-title">
-                <h1>MI CONTROL <span style="color:var(--neon-mag)">V2.0</span></h1>
-                <p style="font-size: 10px; color: #777;">MASTER ADMIN: MAAZ IQBAL | NETWORK: MI TV</p>
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <h1>MI TV <span class="admin-badge" id="logged-user-role">MASTER ADMIN</span></h1>
             </div>
-            <div style="display: flex; gap: 15px;">
-                <button onclick="clearChatData()" class="btn-glow btn-mag" style="padding: 8px 15px; font-size: 10px; width: auto;"><i class="fas fa-broom"></i> CLEAR CHAT</button>
-                <button onclick="location.reload()" style="background:none; border: 1px solid #444; color: #fff; cursor:pointer; padding: 5px 15px; border-radius: 8px;">LOGOUT</button>
+            <div class="nav-stats">
+                <div class="stat-item">
+                    <span>LIVE USERS</span>
+                    <b id="live-user-count">0</b>
+                </div>
+                <div class="stat-item">
+                    <span>TOTAL VOTES CAST</span>
+                    <b id="total-vote-count">0</b>
+                </div>
+                <button class="btn btn-red" style="padding: 10px 20px; font-size: 12px; width: auto;" onclick="logoutAdmin()">
+                    <i class="fas fa-power-off"></i> LOGOUT
+                </button>
             </div>
-        </header>
+        </nav>
 
-        <div class="admin-grid">
-            
-            <div class="card">
-                <h2><i class="fas fa-poll"></i> Launch Supreme Poll</h2>
-                <div class="field-group">
-                    <label>Main Image Link</label>
-                    <input type="text" id="p-img" placeholder="https://i.ibb.co/...">
+        <div class="grid-container">
+
+            <div class="card col-4">
+                <div class="card-header">
+                    <h2><i class="fas fa-plus-circle"></i> DEPLOY NEW POLL</h2>
                 </div>
-                <div class="field-group">
-                    <label>Post Description (Caption)</label>
-                    <textarea id="p-desc" rows="3" placeholder="Explain the poll details..."></textarea>
+                <div class="form-group">
+                    <label>Main Image URL</label>
+                    <input type="text" id="poll-img" class="form-control" placeholder="https://i.ibb.co/...">
                 </div>
-                <div class="field-group">
-                    <label>The Question</label>
-                    <input type="text" id="p-ques" placeholder="Which one do you choose?">
+                <div class="form-group">
+                    <label>Poll Question</label>
+                    <input type="text" id="poll-question" class="form-control" placeholder="Who will win today?">
+                </div>
+                <div class="form-group">
+                    <label>Detailed Description</label>
+                    <textarea id="poll-desc" class="form-control" placeholder="Explain the rules or context here..."></textarea>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <div class="field-group" style="flex:1">
-                        <label>Option A</label>
-                        <input type="text" id="p-optA" placeholder="Player 1">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Candidate A</label>
+                        <input type="text" id="poll-optA" class="form-control" placeholder="Name A">
                     </div>
-                    <div class="field-group" style="flex:1">
-                        <label>Option B</label>
-                        <input type="text" id="p-optB" placeholder="Player 2">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Candidate B</label>
+                        <input type="text" id="poll-optB" class="form-control" placeholder="Name B">
                     </div>
                 </div>
-                <button class="btn-glow btn-cyan" onclick="handlePollPublish()"><i class="fas fa-paper-plane"></i> PUBLISH LIVE</button>
+                <div class="form-group">
+                    <label>Ending Date & Time (Crucial for Countdown)</label>
+                    <input type="datetime-local" id="poll-endtime" class="form-control">
+                </div>
+                <button class="btn btn-cyan" onclick="createPoll()">
+                    <i class="fas fa-rocket"></i> LAUNCH POLL
+                </button>
             </div>
 
-            <div class="card">
-                <h2><i class="fas fa-video"></i> Broadcast Media</h2>
-                <div class="field-group">
-                    <label>Media Title</label>
-                    <input type="text" id="m-title" placeholder="Important Video Update!">
+            <div class="card col-8">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-line"></i> ACTIVE POLLS MONITOR</h2>
+                    <span style="font-size: 10px; color: #888;">Real-time sync enabled</span>
                 </div>
-                <div class="field-group">
-                    <label>Video URL (YouTube/FB)</label>
-                    <input type="url" id="m-link" placeholder="Paste link here...">
-                </div>
-                <div class="field-group">
-                    <label>Description</label>
-                    <textarea id="m-desc" rows="3" placeholder="Tell users why to watch..."></textarea>
-                </div>
-                <button class="btn-glow btn-mag" onclick="handleMediaPublish()"><i class="fas fa-broadcast-tower"></i> START BROADCAST</button>
-            </div>
-
-            <div class="card">
-                <h2><i class="fas fa-folder-open"></i> Manage Posts</h2>
-                <div class="field-group">
-                    <select id="manage-type" onchange="loadContentManager()">
-                        <option value="Polls">Active Polls</option>
-                        <option value="MediaAnnouncements">Media Posts</option>
-                    </select>
-                </div>
-                <div class="content-list" id="content-manager-list">
-                    <p style="text-align:center; color:#444; font-size:12px;">Select type to manage content</p>
+                <div class="poll-list" id="active-polls-container">
+                    <p style="text-align:center; color:#555; margin-top: 50px;">Scanning database for active polls...</p>
                 </div>
             </div>
 
-            <div class="card">
-                <h2><i class="fas fa-comments"></i> Admin Live Chat</h2>
-                <div id="admin-chat-area">
+            <div class="card col-6">
+                <div class="card-header">
+                    <h2><i class="fab fa-youtube"></i> MEDIA BROADCAST CENTER</h2>
+                </div>
+                <p style="font-size: 11px; color: #888; margin-bottom: 15px;">Push YouTube videos directly to user screens. Iframe will automatically resize to 16:9.</p>
+                <div class="form-group">
+                    <label>Broadcast Title</label>
+                    <input type="text" id="media-title" class="form-control" placeholder="Live Match Streaming!">
+                </div>
+                <div class="form-group">
+                    <label>YouTube Video ID (Not full link)</label>
+                    <input type="text" id="media-id" class="form-control" placeholder="e.g., dQw4w9WgXcQ">
+                </div>
+                <div class="form-group">
+                    <label>Ad/Sponsor Overlay Text</label>
+                    <input type="text" id="media-ad" class="form-control" placeholder="Sponsored by MI TV Network">
+                </div>
+                <button class="btn btn-mag" onclick="pushMediaBroadcast()">
+                    <i class="fas fa-broadcast-tower"></i> START BROADCAST
+                </button>
+            </div>
+
+            <div class="card col-6">
+                <div class="card-header">
+                    <h2><i class="fas fa-comments"></i> GLOBAL CHAT CONTROL</h2>
+                    <button class="icon-btn delete" onclick="clearGlobalChat()" title="Wipe all chat">
+                        <i class="fas fa-dumpster-fire"></i> WIPE ALL
+                    </button>
+                </div>
+                <div class="chat-box" id="admin-chat-box">
                     </div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="admin-msg-input" placeholder="Type as Admin..." style="flex: 1;">
-                    <button class="btn-glow btn-cyan" onclick="sendAdminMsg()" style="width: 60px;"><i class="fas fa-paper-plane"></i></button>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Type as Master Admin..." onkeypress="handleChatEnter(event)">
+                    <button class="btn btn-cyan" style="width: auto; padding: 0 20px;" onclick="sendAdminMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="card" style="grid-column: span 1.5;">
-                <h2><i class="fas fa-database"></i> Live Integrity Monitor</h2>
-                <div style="overflow-x: auto;">
-                    <table style="width:100%; border-collapse: collapse; font-size: 12px;">
-                        <thead style="background: #111; color: var(--neon-cyan);">
+            <div class="card col-12">
+                <div class="card-header">
+                    <h2><i class="fas fa-shield-alt"></i> VOTING INTEGRITY LOG & USER MANAGEMENT</h2>
+                    <input type="text" id="search-log" class="form-control" style="width: 250px; padding: 8px;" placeholder="Search by Phone or Name..." onkeyup="filterLogs()">
+                </div>
+                <div class="table-responsive">
+                    <table id="integrity-table">
+                        <thead>
                             <tr>
-                                <th style="padding: 10px; text-align: left;">USER</th>
-                                <th style="padding: 10px; text-align: left;">CANDIDATE</th>
-                                <th style="padding: 10px; text-align: left;">TIMESTAMP</th>
-                                <th style="padding: 10px; text-align: left;">CONTROL</th>
+                                <th>USER IDENTITY</th>
+                                <th>PHONE / CONTACT</th>
+                                <th>POLL SELECTED</th>
+                                <th>VOTED FOR</th>
+                                <th>TIMESTAMP</th>
+                                <th>ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody id="votes-log-body">
+                        <tbody id="integrity-tbody">
                             </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="card">
-                <h2><i class="fas fa-tachometer-alt"></i> Network Pulse</h2>
-                <div style="display: flex; justify-content: space-around; padding-top: 20px;">
-                    <div style="text-align: center;">
-                        <h1 id="stat-users" style="color: var(--neon-cyan); font-family: 'Orbitron';">0</h1>
-                        <p style="font-size: 10px; color: #888;">USERS</p>
-                    </div>
-                    <div style="text-align: center;">
-                        <h1 id="stat-votes" style="color: var(--neon-mag); font-family: 'Orbitron';">0</h1>
-                        <p style="font-size: 10px; color: #888;">TOTAL VOTES</p>
-                    </div>
-                </div>
+        </div> </div> <div class="modal-overlay" id="edit-poll-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('edit-poll-modal')"><i class="fas fa-times"></i></button>
+            <h2 style="font-family: 'Orbitron'; color: var(--neon-cyan); margin-bottom: 20px;">EDIT POLL</h2>
+            <input type="hidden" id="edit-poll-id">
+            <div class="form-group">
+                <label>Question</label>
+                <input type="text" id="edit-poll-q" class="form-control">
             </div>
-
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="edit-poll-desc" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Update Ending Time</label>
+                <input type="datetime-local" id="edit-poll-time" class="form-control">
+            </div>
+            <button class="btn btn-cyan" onclick="savePollEdits()" style="margin-top: 15px;">SAVE CHANGES</button>
         </div>
     </div>
 
-    <div id="notify">COMMAND EXECUTED!</div>
+    <div id="toast-container"></div>
 
     <script>
-        // --- 1. FIREBASE INITIALIZATION ---
+        /**
+         * MI SYSTEM V2.1 - CORE JAVASCRIPT
+         * Developer: Maaz Iqbal (MI TV Network)
+         * Explanation: Ye script saari logic control karti hai (Login, Firebase, Timers, UI)
+         */
+
+        // 1. FIREBASE CONFIGURATION (Aapka database connection)
         const firebaseConfig = {
             apiKey: "AIzaSyBbnU8DkthpYQMHOLLyj6M0cc05qXfjMcw",
             authDomain: "ramadan-2385b.firebaseapp.com",
@@ -292,192 +757,598 @@
             messagingSenderId: "882828936310",
             appId: "1:882828936310:web:7f97b921031fe130fe4b57"
         };
-        firebase.initializeApp(firebaseConfig);
+        
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
 
-        // --- 2. SECURITY ENGINE ---
-        function unlockAdmin() {
-            const pin = document.getElementById('pin-input').value;
-            if(pin === "123456") {
-                gsap.to("#admin-lock-screen", { 
-                    opacity: 0, scale: 1.5, duration: 0.8, ease: "power2.in", 
-                    onComplete: () => {
-                        document.getElementById('admin-lock-screen').style.display = 'none';
-                        document.getElementById('admin-dashboard').style.display = 'block';
-                        gsap.to("#admin-dashboard", { opacity: 1, duration: 1 });
-                        initializeSystem();
-                    }
+        // Global State Variables
+        let currentAdmin = null;
+        let pollTimers = {}; // Stores setInterval IDs to prevent memory leaks
+
+        // ==========================================================================
+        // MAGIC & UTILITY FUNCTIONS (Sound, Vibrate, Toast, Confetti)
+        // ==========================================================================
+        
+        function playSound(type) {
+            try {
+                const s = document.getElementById('sound-' + type);
+                if(s) { s.currentTime = 0; s.play(); }
+            } catch(e) { console.log("Sound error blocked by browser."); }
+        }
+
+        function triggerVibration(pattern = [50]) {
+            // Haptic feedback agar mobile support kare
+            if (navigator.vibrate) { navigator.vibrate(pattern); }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+
+            if(type === 'success') playSound('success');
+            if(type === 'error') playSound('error');
+        }
+
+        function triggerWinConfetti() {
+            // Screen par patakhay (using canvas-confetti library)
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#00f2ff', '#bc13fe']
                 });
-            } else {
-                alert("❌ ACCESS DENIED: SECURITY BREACH DETECTED!");
-                document.getElementById('pin-input').value = "";
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#00f2ff', '#bc13fe']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+            playSound('win');
+        }
+
+        // ==========================================================================
+        // MULTI-ADMIN AUTHENTICATION SYSTEM (Security)
+        // ==========================================================================
+        
+        // Auto-check session on load
+        window.onload = () => {
+            const session = localStorage.getItem('mi_admin_session');
+            if(session === 'active_maaz') {
+                grantAccess("Maaz (Master)");
+            }
+        };
+
+        function verifyAdmin() {
+            const user = document.getElementById('auth-user').value.trim();
+            const pass = document.getElementById('auth-pass').value.trim();
+            const pin = document.getElementById('auth-pin').value.trim();
+
+            triggerVibration();
+
+            // Hardcoded Master Admin Logic for extreme security
+            // Real app mein ye Firebase Auth se verify hota hai, par hum specific condition laga rahe hain
+            if (user.toLowerCase() === 'maaz' && pass === 'mitv123' && pin === '123456') {
+                localStorage.setItem('mi_admin_session', 'active_maaz');
+                grantAccess("Maaz (Master)");
+            } 
+            else if (user.toLowerCase() === 'subadmin' && pass === 'team123' && pin === '000000') {
+                localStorage.setItem('mi_admin_session', 'active_sub');
+                grantAccess("Team Member");
+            }
+            else {
+                showToast("ACCESS DENIED: Invalid Credentials!", "error");
+                gsap.to(".login-box", {x: [-10, 10, -10, 10, 0], duration: 0.4}); // Shake effect
             }
         }
 
-        // --- 3. PUBLISHING LOGIC ---
-        function handlePollPublish() {
-            const data = {
-                image: document.getElementById('p-img').value,
-                description: document.getElementById('p-desc').value,
-                question: document.getElementById('p-ques').value,
-                optionA: document.getElementById('p-optA').value,
-                optionB: document.getElementById('p-optB').value,
-                counts: { A: 0, B: 0 },
-                timestamp: Date.now()
-            };
+        function grantAccess(roleName) {
+            currentAdmin = roleName;
+            document.getElementById('logged-user-role').innerText = roleName;
+            
+            // GSAP Animation to switch screens
+            gsap.to("#login-screen", {
+                opacity: 0, scale: 1.1, duration: 0.6, ease: "power2.inOut",
+                onComplete: () => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    gsap.to("#dashboard", {opacity: 1, duration: 0.8});
+                    
+                    // Boot up all background systems
+                    bootSystemOperations();
+                }
+            });
+            showToast("System Access Granted. Welcome " + roleName);
+        }
 
-            if(!data.image || !data.question) { alert("Core fields missing!"); return; }
+        function logoutAdmin() {
+            triggerVibration();
+            localStorage.removeItem('mi_admin_session');
+            location.reload(); // Refresh to lock screen
+        }
 
-            db.ref('Polls').push(data).then(() => {
-                showNotify("✅ POLL IS NOW LIVE!");
-                clearFields(['p-img', 'p-desc', 'p-ques', 'p-optA', 'p-optB']);
+        // ==========================================================================
+        // SYSTEM BOOT (Puri machine start karna)
+        // ==========================================================================
+        function bootSystemOperations() {
+            listenLivePresence();
+            listenGlobalStats();
+            listenPollsRealtime();
+            listenGlobalChat();
+            listenIntegrityLog();
+        }
+
+        // Presence System: Check how many users are online
+        function listenLivePresence() {
+            db.ref('SystemStats/OnlineUsers').on('value', snap => {
+                const count = snap.val() || 0;
+                document.getElementById('live-user-count').innerText = count;
+                // Animate count change
+                gsap.fromTo("#live-user-count", {scale: 1.5, color: '#fff'}, {scale: 1, color: 'var(--neon-cyan)', duration: 0.5});
             });
         }
 
-        function handleMediaPublish() {
-            const data = {
-                title: document.getElementById('m-title').value,
-                link: document.getElementById('m-link').value,
-                desc: document.getElementById('m-desc').value,
-                timestamp: Date.now()
-            };
-
-            if(!data.title || !data.link) { alert("Title and Link are vital!"); return; }
-
-            db.ref('MediaAnnouncements').push(data).then(() => {
-                showNotify("🚀 MEDIA BROADCAST STARTED!");
-                clearFields(['m-title', 'm-link', 'm-desc']);
+        function listenGlobalStats() {
+            db.ref('Votes').on('value', snap => {
+                let total = 0;
+                snap.forEach(poll => { total += poll.numChildren(); });
+                document.getElementById('total-vote-count').innerText = total;
             });
         }
 
-        // --- 4. CONTENT MANAGEMENT (Delete System) ---
-        function loadContentManager() {
-            const type = document.getElementById('manage-type').value;
-            const listArea = document.getElementById('content-manager-list');
-            listArea.innerHTML = '<p style="text-align:center; font-size:10px;">Loading Digital Records...</p>';
+        // ==========================================================================
+        // POLL MASTER ENGINE (Create, Read, Update, Delete & TIMER LOGIC)
+        // ==========================================================================
+        
+        function createPoll() {
+            triggerVibration();
+            const img = document.getElementById('poll-img').value;
+            const title = document.getElementById('poll-question').value;
+            const desc = document.getElementById('poll-desc').value;
+            const optA = document.getElementById('poll-optA').value;
+            const optB = document.getElementById('poll-optB').value;
+            const endtimeInput = document.getElementById('poll-endtime').value;
 
-            db.ref(type).on('value', snap => {
-                listArea.innerHTML = '';
-                if(!snap.exists()) { listArea.innerHTML = '<p style="text-align:center; color:#555;">No Content Found.</p>'; return; }
+            if(!title || !optA || !optB || !endtimeInput) {
+                showToast("Fill all crucial fields and set End Time!", "error");
+                return;
+            }
+
+            // Convert datetime-local value to timestamp (milliseconds)
+            const endingTimestamp = new Date(endtimeInput).getTime();
+            const currentTimestamp = Date.now();
+
+            if(endingTimestamp <= currentTimestamp) {
+                showToast("Ending time must be in the future!", "error");
+                return;
+            }
+
+            const pollData = {
+                image: img,
+                question: title,
+                description: desc,
+                optionA: optA,
+                optionB: optB,
+                createdAt: currentTimestamp,
+                endTime: endingTimestamp,
+                status: 'active', // 'active' or 'closed'
+                counts: { a: 0, b: 0 } // Cache for quick read
+            };
+
+            db.ref('Polls').push(pollData).then(() => {
+                showToast("POLL SUCCESSFULLY DEPLOYED!");
+                // Clear fields
+                ['poll-img', 'poll-question', 'poll-desc', 'poll-optA', 'poll-optB', 'poll-endtime'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            }).catch(e => showToast(e.message, "error"));
+        }
+
+        function listenPollsRealtime() {
+            const container = document.getElementById('active-polls-container');
+
+            db.ref('Polls').on('value', snap => {
+                container.innerHTML = '';
+                if(!snap.exists()) {
+                    container.innerHTML = '<p style="text-align:center; color:#555;">No Active Polls.</p>';
+                    return;
+                }
+
+                // Clear existing timers to prevent duplicates
+                Object.keys(pollTimers).forEach(id => clearInterval(pollTimers[id]));
 
                 snap.forEach(child => {
-                    const item = child.val();
                     const id = child.key;
-                    const title = item.question || item.title || "Untitled Post";
-
-                    listArea.innerHTML += `
-                        <div class="list-item">
-                            <div class="item-info">
-                                <h4>${title}</h4>
-                                <p>ID: ${id}</p>
-                            </div>
-                            <button class="del-btn" onclick="deleteContent('${type}', '${id}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
+                    const p = child.val();
+                    renderPollCard(id, p, container);
                 });
             });
         }
 
-        function deleteContent(path, id) {
-            if(confirm("🚨 SYSTEM WARNING: This will permanently erase this record. Proceed?")) {
-                db.ref(`${path}/${id}`).remove().then(() => {
-                    showNotify("🗑️ RECORD ERASED!");
-                });
+        function renderPollCard(id, p, container) {
+            const isClosed = p.status === 'closed';
+            
+            // Create DOM Element
+            const div = document.createElement('div');
+            div.className = `poll-item ${isClosed ? 'closed' : ''}`;
+            div.id = `poll-card-${id}`;
+
+            // HTML Structure for Poll Card
+            div.innerHTML = `
+                <div class="poll-meta">
+                    <div>
+                        <div class="poll-title">${p.question}</div>
+                        <div class="poll-desc">${p.description}</div>
+                        <div style="font-size:9px; color:#555; margin-top:5px;">ID: ${id}</div>
+                    </div>
+                    <div class="timer-badge ${isClosed ? 'ending' : ''}" id="timer-${id}">
+                        <i class="fas fa-clock"></i> <span>${isClosed ? 'CLOSED' : 'CALCULATING...'}</span>
+                    </div>
+                </div>
+                
+                <div class="vs-counters">
+                    <div class="counter-box opt-a">
+                        <span class="counter-name">${p.optionA}</span>
+                        <span class="counter-val" id="val-a-${id}">0</span>
+                        <div class="progress-bg" id="prog-a-${id}"></div>
+                    </div>
+                    <div style="font-family:'Orbitron'; color:#555;">VS</div>
+                    <div class="counter-box opt-b">
+                        <span class="counter-name">${p.optionB}</span>
+                        <span class="counter-val" id="val-b-${id}">0</span>
+                        <div class="progress-bg" id="prog-b-${id}"></div>
+                    </div>
+                </div>
+
+                <div class="action-btns">
+                    <button class="icon-btn edit" onclick="openEditPoll('${id}', '${escapeHtml(p.question)}', '${p.endTime}')" ${isClosed ? 'disabled' : ''}>
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="icon-btn delete" onclick="deletePoll('${id}')">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                    ${!isClosed ? `
+                    <button class="icon-btn" onclick="forceClosePoll('${id}')" style="color:var(--neon-gold)">
+                        <i class="fas fa-ban"></i> Force Close
+                    </button>` : ''}
+                </div>
+            `;
+            
+            // Append at top
+            container.prepend(div);
+
+            // Fetch Real-time Live Votes logic
+            listenPollVotes(id);
+
+            // Start Countdown Timer Magic
+            if(!isClosed) {
+                startCountdownLogic(id, p.endTime);
             }
         }
 
-        // --- 5. ADMIN CHAT MESSAGING ---
-        function sendAdminMsg() {
-            const input = document.getElementById('admin-msg-input');
+        // Advanced Timer Engine
+        function startCountdownLogic(pollId, endTime) {
+            const timerEl = document.getElementById(`timer-${pollId}`);
+            const cardEl = document.getElementById(`poll-card-${pollId}`);
+
+            pollTimers[pollId] = setInterval(() => {
+                const now = Date.now();
+                const diff = endTime - now;
+
+                if (diff <= 0) {
+                    clearInterval(pollTimers[pollId]);
+                    if(timerEl) timerEl.innerHTML = '<i class="fas fa-flag-checkered"></i> <span>TIME UP!</span>';
+                    if(cardEl) cardEl.classList.remove('urgent');
+                    
+                    // Auto-close in database (Only trigger once)
+                    db.ref(`Polls/${pollId}`).update({ status: 'closed' });
+                    triggerWinConfetti(); // MAGIC!
+                    return;
+                }
+
+                // Calculate Time Let
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if(timerEl) {
+                    timerEl.querySelector('span').innerText = 
+                        `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+
+                // Pulse Magic (Red Alert when < 5 mins)
+                if(diff < 5 * 60 * 1000 && diff > 0) {
+                    if(cardEl && !cardEl.classList.contains('urgent')) {
+                        cardEl.classList.add('urgent');
+                        timerEl.classList.add('ending');
+                        playSound('tick'); // Gentle tick
+                    }
+                }
+            }, 1000);
+        }
+
+        // Live Real-Time Individual Counters
+        function listenPollVotes(pollId) {
+            db.ref(`Votes/${pollId}`).on('value', snap => {
+                let countA = 0, countB = 0;
+                
+                // Get Option Names to match
+                db.ref(`Polls/${pollId}`).once('value').then(pSnap => {
+                    const poll = pSnap.val();
+                    if(!poll) return;
+
+                    snap.forEach(vote => {
+                        if(vote.val().candidate === poll.optionA) countA++;
+                        if(vote.val().candidate === poll.optionB) countB++;
+                    });
+
+                    // Update UI text
+                    const elA = document.getElementById(`val-a-${pollId}`);
+                    const elB = document.getElementById(`val-b-${pollId}`);
+                    if(elA) elA.innerText = countA;
+                    if(elB) elB.innerText = countB;
+
+                    // Update UI Progress Bars (Magic Element)
+                    const total = countA + countB;
+                    const pctA = total === 0 ? 0 : (countA / total) * 100;
+                    const pctB = total === 0 ? 0 : (countB / total) * 100;
+
+                    const barA = document.getElementById(`prog-a-${pollId}`);
+                    const barB = document.getElementById(`prog-b-${pollId}`);
+                    if(barA) barA.style.width = `${pctA}%`;
+                    if(barB) barB.style.width = `${pctB}%`;
+                });
+            });
+        }
+
+        function deletePoll(id) {
+            triggerVibration();
+            if(confirm("🚨 ALERT: Are you sure you want to completely erase this poll and all its votes?")) {
+                db.ref(`Polls/${id}`).remove();
+                db.ref(`Votes/${id}`).remove();
+                showToast("Poll Erased from Existence.", "error");
+            }
+        }
+
+        function forceClosePoll(id) {
+            triggerVibration();
+            db.ref(`Polls/${id}`).update({ status: 'closed', endTime: Date.now() });
+            showToast("Poll manually closed!");
+        }
+
+        // Modals Management
+        function openEditPoll(id, currentQ, currentEndTime) {
+            document.getElementById('edit-poll-id').value = id;
+            document.getElementById('edit-poll-q').value = currentQ;
+            // Format time for input
+            const d = new Date(currentEndTime);
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            document.getElementById('edit-poll-time').value = d.toISOString().slice(0,16);
+            
+            document.getElementById('edit-poll-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function savePollEdits() {
+            const id = document.getElementById('edit-poll-id').value;
+            const q = document.getElementById('edit-poll-q').value;
+            const desc = document.getElementById('edit-poll-desc').value;
+            const timeStr = document.getElementById('edit-poll-time').value;
+
+            const updates = { question: q };
+            if(desc) updates.description = desc;
+            if(timeStr) updates.endTime = new Date(timeStr).getTime();
+
+            db.ref(`Polls/${id}`).update(updates).then(() => {
+                showToast("Poll Updated Successfully!");
+                closeModal('edit-poll-modal');
+            });
+        }
+
+        // ==========================================================================
+        // MEDIA BROADCAST (YouTube Integration)
+        // ==========================================================================
+        function pushMediaBroadcast() {
+            triggerVibration();
+            const title = document.getElementById('media-title').value;
+            const yId = document.getElementById('media-id').value;
+            const adText = document.getElementById('media-ad').value;
+
+            if(!title || !yId) return showToast("Title and Video ID are required!", "error");
+
+            db.ref('SystemBroadcast').set({
+                type: 'youtube',
+                title: title,
+                videoId: yId,
+                adOverlay: adText,
+                timestamp: Date.now()
+            }).then(() => {
+                showToast("BROADCAST PUSHED TO ALL USERS!");
+                document.getElementById('media-title').value = '';
+                document.getElementById('media-id').value = '';
+            });
+        }
+
+        // ==========================================================================
+        // LIVE CHAT CONTROL
+        // ==========================================================================
+        function handleChatEnter(e) {
+            if(e.key === 'Enter') sendAdminMessage();
+        }
+
+        function sendAdminMessage() {
+            const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if(!text) return;
 
             db.ref('GlobalChat').push({
-                uid: "ADMIN_MAAZ",
-                sender: "Admin Maaz",
-                isAdmin: true,
+                sender: currentAdmin || "Master Admin",
                 text: text,
+                isAdmin: true,
                 timestamp: Date.now()
             }).then(() => {
                 input.value = '';
+                playSound('success');
             });
         }
 
-        function listenChat() {
-            const chatArea = document.getElementById('admin-chat-area');
-            db.ref('GlobalChat').limitToLast(20).on('child_added', snap => {
-                const msg = snap.val();
-                const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                chatArea.innerHTML += `
-                    <div class="admin-chat-msg">
-                        <small style="color:#555">${time}</small> <b>${msg.sender}:</b> ${msg.text}
-                    </div>
-                `;
-                chatArea.scrollTop = chatArea.scrollHeight;
-            });
-        }
-
-        function clearChatData() {
-            if(confirm("🧹 Wipe entire chat history?")) {
-                db.ref('GlobalChat').remove().then(() => {
-                    document.getElementById('admin-chat-area').innerHTML = '';
-                    showNotify("✨ CHAT CLEANED!");
+        function listenGlobalChat() {
+            const box = document.getElementById('admin-chat-box');
+            
+            db.ref('GlobalChat').limitToLast(50).on('value', snap => {
+                box.innerHTML = '';
+                snap.forEach(child => {
+                    const msg = child.val();
+                    const id = child.key;
+                    const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    const div = document.createElement('div');
+                    div.className = `chat-msg ${msg.isAdmin ? 'admin-msg' : ''}`;
+                    div.innerHTML = `
+                        <div class="chat-header">
+                            <span class="chat-sender">${msg.sender} ${msg.isAdmin ? '<i class="fas fa-crown"></i>' : ''}</span>
+                            <span>${time}</span>
+                        </div>
+                        <div class="chat-text">${escapeHtml(msg.text)}</div>
+                        <button class="chat-del" onclick="deleteChatMessage('${id}')"><i class="fas fa-trash"></i></button>
+                    `;
+                    box.appendChild(div);
                 });
+                // Auto scroll to bottom
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function deleteChatMessage(id) {
+            db.ref(`GlobalChat/${id}`).remove();
+        }
+
+        function clearGlobalChat() {
+            if(confirm("Are you sure? This will delete ALL messages for everyone!")) {
+                db.ref('GlobalChat').remove().then(() => showToast("Chat Wiped Clean.", "error"));
             }
         }
 
-        // --- 6. SYSTEM INITIALIZATION & STATS ---
-        function initializeSystem() {
-            loadContentManager(); // Default load
-            listenChat();
+        // ==========================================================================
+        // INTEGRITY LOG (Tracking every single vote for security)
+        // ==========================================================================
+        let allLogs = []; // Array to store logs for search filtering
 
-            // Live Users Stat
-            db.ref('Users').on('value', snap => {
-                document.getElementById('stat-users').innerText = snap.numChildren();
-            });
-
-            // Live Vote Tracker
+        function listenIntegrityLog() {
             db.ref('Votes').on('value', snap => {
-                const body = document.getElementById('votes-log-body');
-                body.innerHTML = '';
-                let total = 0;
+                allLogs = [];
+                const tbody = document.getElementById('integrity-tbody');
+                
+                // Fetch Poll Titles to map IDs to Names
+                db.ref('Polls').once('value').then(pSnap => {
+                    const polls = pSnap.val() || {};
 
-                snap.forEach(poll => {
-                    poll.forEach(vote => {
-                        total++;
-                        const v = vote.val();
-                        body.innerHTML = `
-                            <tr style="border-bottom: 1px solid #111;">
-                                <td style="padding:10px;">${v.name}</td>
-                                <td style="padding:10px; color:var(--neon-mag)">${v.candidate}</td>
-                                <td style="padding:10px; color:#555">${new Date(v.time).toLocaleTimeString()}</td>
-                                <td style="padding:10px;"><button onclick="deleteVoteRecord('${poll.key}', '${vote.key}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-times-circle"></i></button></td>
-                            </tr>
-                        ` + body.innerHTML;
+                    snap.forEach(pollGroup => {
+                        const pollId = pollGroup.key;
+                        const pollTitle = polls[pollId] ? polls[pollId].question : `Unknown Poll (${pollId})`;
+
+                        pollGroup.forEach(vote => {
+                            const v = vote.val();
+                            allLogs.push({
+                                pollId: pollId,
+                                voteId: vote.key,
+                                pollTitle: pollTitle,
+                                userName: v.name || 'Anonymous',
+                                uid: v.uid || 'N/A',
+                                phone: v.phone || 'N/A',
+                                candidate: v.candidate,
+                                time: v.timestamp || v.time || Date.now() // Fallback
+                            });
+                        });
                     });
+
+                    // Sort newest first
+                    allLogs.sort((a, b) => b.time - a.time);
+                    renderLogTable(allLogs);
                 });
-                document.getElementById('stat-votes').innerText = total;
             });
         }
 
-        function deleteVoteRecord(pid, vid) {
-            if(confirm("Delete this specific vote?")) {
-                db.ref(`Votes/${pid}/${vid}`).remove().then(() => showNotify("Vote Deleted!"));
+        function renderLogTable(dataArray) {
+            const tbody = document.getElementById('integrity-tbody');
+            tbody.innerHTML = '';
+            
+            dataArray.forEach(log => {
+                const dateStr = new Date(log.time).toLocaleString();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <span class="tag-user">${escapeHtml(log.userName)}</span><br>
+                        <span class="tag-uid">UID: ${log.uid}</span>
+                    </td>
+                    <td style="color:var(--neon-cyan)">${escapeHtml(log.phone)}</td>
+                    <td style="font-size:11px; color:#888;">${escapeHtml(log.pollTitle)}</td>
+                    <td><span class="tag-vote">${escapeHtml(log.candidate)}</span></td>
+                    <td class="tag-time">${dateStr}</td>
+                    <td>
+                        <button class="icon-btn delete" onclick="deleteSingleVote('${log.pollId}', '${log.voteId}')" title="Revoke Vote">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterLogs() {
+            const term = document.getElementById('search-log').value.toLowerCase();
+            const filtered = allLogs.filter(log => 
+                log.userName.toLowerCase().includes(term) || 
+                log.phone.toLowerCase().includes(term)
+            );
+            renderLogTable(filtered);
+        }
+
+        function deleteSingleVote(pollId, voteId) {
+            if(confirm("Revoke this specific user's vote? (This affects the counter)")) {
+                db.ref(`Votes/${pollId}/${voteId}`).remove().then(() => {
+                    showToast("Vote successfully revoked and deleted.");
+                });
             }
         }
 
-        // --- UTILITIES ---
-        function showNotify(msg) {
-            const n = document.getElementById('notify');
-            n.innerText = msg;
-            n.style.transform = "translateY(0)";
-            setTimeout(() => n.style.transform = "translateY(150%)", 3000);
-        }
-
-        function clearFields(ids) {
-            ids.forEach(id => document.getElementById(id).value = '');
+        // Utility: Protect from XSS attacks when displaying text
+        function escapeHtml(unsafe) {
+            if(!unsafe) return '';
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
         }
 
     </script>
