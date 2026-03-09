@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MI ADMIN V2.1 | SUPREME CONTROL</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00f2ff">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ================================================================
+           1. MASTER NEON CYBERPUNK TERMINAL UI
+           ================================================================ */
+        :root {
+            --neon-cyan: #00f2ff;
+            --neon-mag: #bc13fe;
+            --neon-red: #ff0055;
+            --neon-green: #00ff9d;
+            --neon-yellow: #f0f000;
+            --bg-deep: #020205;
+            --glass-bg: rgba(10, 10, 18, 0.95);
+            --glass-border: rgba(0, 242, 255, 0.15);
+            --panel-shadow: 0 0 40px rgba(0,0,0,0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--neon-cyan) #000; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 10px; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(188, 19, 254, 0.05) 0%, transparent 40%);
+        }
+
+        /* --- DIGITAL GRID ANIMATION --- */
+        body::before {
+            content: ""; position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 242, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px; z-index: -1;
+        }
+
+        /* ================================================================
+           2. SECURITY INTERFACE (ACCESS CONTROL)
+           ================================================================ */
+        #admin-lock-screen {
+            position: fixed; inset: 0; background: #000; z-index: 100000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .lock-card {
+            background: var(--glass-bg); padding: 40px; border-radius: 30px;
+            border: 2px solid var(--neon-cyan); text-align: center; width: 380px;
+            box-shadow: 0 0 60px rgba(0, 242, 255, 0.2); backdrop-filter: blur(20px);
+        }
+        .lock-logo { width: 90px; margin-bottom: 20px; animation: glow 2s infinite alternate; }
+        @keyframes glow { from { filter: drop-shadow(0 0 2px var(--neon-cyan)); } to { filter: drop-shadow(0 0 15px var(--neon-cyan)); } }
+        
+        .pin-field {
+            background: #000; border: 2px solid var(--neon-mag); padding: 15px;
+            border-radius: 12px; color: var(--neon-cyan); font-size: 30px;
+            text-align: center; letter-spacing: 12px; width: 100%; outline: none; margin: 20px 0;
+            font-family: 'Orbitron';
+        }
+
+        /* ================================================================
+           3. DASHBOARD ARCHITECTURE
+           ================================================================ */
+        #admin-dashboard { display: none; padding: 20px; opacity: 0; }
+        
+        .main-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 30px; background: var(--glass-bg); border-radius: 20px;
+            border-bottom: 2px solid var(--neon-cyan); margin-bottom: 25px;
+            position: sticky; top: 10px; z-index: 999;
+        }
+        .brand h1 { font-family: 'Orbitron'; font-size: 18px; letter-spacing: 2px; }
+
+        .admin-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+        
+        .card {
+            background: var(--glass-bg); border-radius: 20px; padding: 25px;
+            border: 1px solid var(--glass-border); transition: 0.3s ease;
+        }
+        .card:hover { border-color: var(--neon-cyan); box-shadow: 0 10px 30px rgba(0, 242, 255, 0.1); }
+        .card h2 { font-family: 'Orbitron'; font-size: 14px; color: var(--neon-cyan); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* --- FORM STYLING --- */
+        .input-group { margin-bottom: 15px; }
+        label { font-size: 10px; color: #666; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        input, textarea, select {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #222;
+            border-radius: 10px; color: #fff; font-size: 13px; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
+
+        .btn-action {
+            width: 100%; padding: 14px; border: none; border-radius: 10px; font-family: 'Orbitron';
+            font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-cyan { background: var(--neon-cyan); color: #000; }
+        .btn-mag { background: var(--neon-mag); color: #fff; }
+        .btn-action:hover { transform: translateY(-3px); filter: brightness(1.2); letter-spacing: 2px; }
+
+        /* --- POLL LISTING & COUNTERS --- */
+        #active-polls-list { max-height: 500px; overflow-y: auto; }
+        .poll-item {
+            background: rgba(0,0,0,0.4); border-radius: 15px; padding: 15px;
+            margin-bottom: 15px; border-left: 4px solid var(--neon-mag);
+        }
+        .counter-box {
+            display: flex; gap: 10px; margin-top: 15px;
+        }
+        .count-pill {
+            flex: 1; background: #000; padding: 10px; border-radius: 10px; text-align: center;
+            border: 1px solid #222;
+        }
+        .count-pill span { display: block; font-size: 9px; color: #555; }
+        .count-pill b { font-size: 18px; color: var(--neon-cyan); font-family: 'Roboto Mono'; }
+
+        /* --- INTEGRITY LOG TABLE --- */
+        .table-wrapper { overflow-x: auto; max-height: 400px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #111; color: var(--neon-cyan); padding: 12px; text-align: left; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #111; color: #ccc; }
+        .user-tag { color: #fff; font-weight: bold; }
+        .vote-tag { background: rgba(188, 19, 254, 0.2); color: var(--neon-mag); padding: 3px 8px; border-radius: 4px; font-weight: 800; }
+
+        /* --- NOTIFICATION --- */
+        #toast {
+            position: fixed; bottom: 30px; right: 30px; padding: 15px 30px;
+            background: var(--neon-green); color: #000; border-radius: 10px;
+            font-weight: 900; transform: translateX(200%); transition: 0.5s; z-index: 100001;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="admin-lock-screen">
+        <div class="lock-card">
+            <img src="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png" class="lock-logo">
+            <h1 style="font-family: 'Orbitron'; color: #fff; font-size: 20px;">MAAZ CONTROL CENTER</h1>
+            <input type="password" id="pin-input" class="pin-field" maxlength="6" placeholder="******">
+            <button class="btn-action btn-cyan" onclick="verifyAccess()">ACCESS SYSTEM</button>
+        </div>
+    </div>
+
+    <div id="admin-dashboard">
+        
+        <nav class="main-nav">
+            <div class="brand">
+                <h1>MI SYSTEM <span style="color: var(--neon-mag);">SUPREME</span></h1>
+                <p style="font-size: 9px; color: #666;">ROOT ACCESS: MAAZ IQBAL | PROJECT: MI TV NETWORK</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="text-align: right;">
+                    <span style="font-size: 10px; color: var(--neon-cyan);">LIVE USERS: <b id="stat-u">0</b></span><br>
+                    <span style="font-size: 10px; color: var(--neon-mag);">TOTAL VOTES: <b id="stat-v">0</b></span>
+                </div>
+                <button onclick="location.reload()" class="btn-action btn-mag" style="width: auto; padding: 8px 15px; font-size: 10px;">LOGOUT</button>
+            </div>
+        </nav>
+
+        <div class="admin-grid">
+
+            <div class="card" style="grid-column: span 4;">
+                <h2><i class="fas fa-plus-square"></i> DEPLOY NEW POLL</h2>
+                <div class="input-group">
+                    <label>Poll Header Image (URL)</label>
+                    <input type="text" id="p-img" placeholder="https://link-to-image.png">
+                </div>
+                <div class="input-group">
+                    <label>Poll Title (The Question)</label>
+                    <input type="text" id="p-title" placeholder="Who is the king of cricket?">
+                </div>
+                <div class="input-group">
+                    <label>Poll Description (The Context)</label>
+                    <textarea id="p-desc" rows="3" placeholder="Enter details about this mukabla..."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex:1">
+                        <label>Option A</label>
+                        <input type="text" id="p-a" placeholder="Candidate 1">
+                    </div>
+                    <div class="input-group" style="flex:1">
+                        <label>Option B</label>
+                        <input type="text" id="p-b" placeholder="Candidate 2">
+                    </div>
+                </div>
+                <button class="btn-action btn-cyan" onclick="publishPoll()"><i class="fas fa-rocket"></i> PUBLISH LIVE</button>
+            </div>
+
+            <div class="card" style="grid-column: span 8;">
+                <h2><i class="fas fa-chart-pie"></i> INDIVIDUAL POLL MONITOR (REAL-TIME)</h2>
+                <div id="active-polls-list">
+                    <p style="text-align:center; color:#333; padding:50px;">Waiting for Digital Signals...</p>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: span 12;">
+                <h2><i class="fas fa-user-secret"></i> LIVE VOTING INTEGRITY LOG (USER IDENTITY)</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>USER IDENTITY</th>
+                                <th>CONTACT</th>
+                                <th>SELECTION</th>
+                                <th>POLL TARGET</th>
+                                <th>TIME LOG</th>
+                                <th>CONTROL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="integrity-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="toast">SYSTEM NOTIFIED</div>
+
+    <script>
+        // --- [1. FIREBASE CONNECT] ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbnU8DkthpYQMHOLLyj6M0cc05qXfjMcw",
+            authDomain: "ramadan-2385b.firebaseapp.com",
+            databaseURL: "https://ramadan-2385b-default-rtdb.firebaseio.com",
+            projectId: "ramadan-2385b",
+            storageBucket: "ramadan-2385b.firebasestorage.app",
+            messagingSenderId: "882828936310",
+            appId: "1:882828936310:web:7f97b921031fe130fe4b57"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- [2. SECURITY LOGIC] ---
+        function verifyAccess() {
+            const pin = document.getElementById('pin-input').value;
+            if(pin === "123456") {
+                gsap.to("#admin-lock-screen", { opacity: 0, y: -100, duration: 0.5, onComplete: () => {
+                    document.getElementById('admin-lock-screen').style.display = 'none';
+                    document.getElementById('admin-dashboard').style.display = 'block';
+                    gsap.to("#admin-dashboard", { opacity: 1, duration: 1 });
+                    bootSystem();
+                }});
+            } else {
+                alert("ACCESS DENIED!");
+            }
+        }
+
+        // --- [3. MAIN ENGINE] ---
+        function bootSystem() {
+            renderPolls();
+            renderIntegrityLog();
+            
+            // Stats logic
+            db.ref('Users').on('value', s => document.getElementById('stat-u').innerText = s.numChildren());
+        }
+
+        // --- [4. POLL MANAGEMENT] ---
+        function publishPoll() {
+            const data = {
+                image: document.getElementById('p-img').value,
+                title: document.getElementById('p-title').value,
+                description: document.getElementById('p-desc').value,
+                optionA: document.getElementById('p-a').value,
+                optionB: document.getElementById('p-b').value,
+                timestamp: Date.now()
+            };
+
+            if(!data.title || !data.optionA) return alert("Fill mandatory fields!");
+
+            db.ref('Polls').push(data).then(() => {
+                showToast("POLL DEPLOYED LIVE");
+                document.querySelectorAll('input, textarea').forEach(i => i.value = '');
+            });
+        }
+
+        function renderPolls() {
+            db.ref('Polls').on('value', snap => {
+                const list = document.getElementById('active-polls-list');
+                list.innerHTML = '';
+                
+                snap.forEach(child => {
+                    const p = child.val();
+                    const id = child.key;
+
+                    const pollUI = `
+                        <div class="poll-item">
+                            <div style="display:flex; justify-content:space-between; align-items:start;">
+                                <div style="flex:1">
+                                    <h4 style="color:var(--neon-cyan);">${p.title}</h4>
+                                    <p style="font-size:10px; color:#666; margin-top:5px;">${p.description || 'No description provided.'}</p>
+                                </div>
+                                <button onclick="erasePoll('${id}')" style="background:none; border:none; color:var(--neon-red); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="counter-box">
+                                <div class="count-pill">
+                                    <span>${p.optionA}</span>
+                                    <b id="v-a-${id}">0</b>
+                                </div>
+                                <div class="count-pill" style="border-color:var(--neon-mag)">
+                                    <span>${p.optionB}</span>
+                                    <b id="v-b-${id}" style="color:var(--neon-mag)">0</b>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += pollUI;
+
+                    // REAL-TIME INDIVIDUAL VOTE COUNTER LOGIC
+                    db.ref('Votes/' + id).on('value', vSnap => {
+                        let cA = 0, cB = 0;
+                        vSnap.forEach(vDoc => {
+                            const v = vDoc.val();
+                            if(v.candidate === p.optionA) cA++;
+                            if(v.candidate === p.optionB) cB++;
+                        });
+                        const elA = document.getElementById(`v-a-${id}`);
+                        const elB = document.getElementById(`v-b-${id}`);
+                        if(elA) elA.innerText = cA;
+                        if(elB) elB.innerText = cB;
+                    });
+                });
+            });
+        }
+
+        // --- [5. INTEGRITY & IDENTITY LOG] ---
+        function renderIntegrityLog() {
+            db.ref('Votes').on('value', snap => {
+                const body = document.getElementById('integrity-body');
+                body.innerHTML = '';
+                let totalVotes = 0;
+                let logArray = [];
+
+                snap.forEach(pollGroup => {
+                    const pollId = pollGroup.key;
+                    pollGroup.forEach(vote => {
+                        totalVotes++;
+                        logArray.push({ ...vote.val(), pollId, voteKey: vote.key });
+                    });
+                });
+
+                document.getElementById('stat-v').innerText = totalVotes;
+                logArray.sort((a, b) => b.time - a.time);
+
+                logArray.forEach(v => {
+                    body.innerHTML += `
+                        <tr>
+                            <td><span class="user-tag">${v.name || 'Unknown'}</span><br><small style="color:#444">ID: ${v.uid || 'N/A'}</small></td>
+                            <td style="color:var(--neon-cyan)">${v.phone || 'N/A'}</td>
+                            <td><span class="vote-tag">${v.candidate}</span></td>
+                            <td style="color:#555">${v.pollTitle || 'Direct Poll'}</td>
+                            <td style="font-family:'Roboto Mono'; font-size:10px;">${new Date(v.time).toLocaleString()}</td>
+                            <td>
+                                <button onclick="eraseVote('${v.pollId}', '${v.voteKey}')" style="background:none; border:none; color:#333; cursor:pointer;"><i class="fas fa-user-minus"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // --- [6. ACTION UTILITIES] ---
+        function erasePoll(id) {
+            if(confirm("Maaz, kya aap waqai is POll ko delete karna chahte hain? Sab data udd jayega!")) {
+                db.ref('Polls/' + id).remove();
+                db.ref('Votes/' + id).remove();
+                showToast("POLL ERASED");
+            }
+        }
+
+        function eraseVote(pid, vid) {
+            if(confirm("Delete this specific vote entry?")) {
+                db.ref(`Votes/${pid}/${vid}`).remove();
+                showToast("VOTE DELETED");
+            }
+        }
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m;
+            t.style.transform = "translateX(0)";
+            setTimeout(() => t.style.transform = "translateX(200%)", 3000);
+        }
+
+    </script>
+</body>
+</html>
