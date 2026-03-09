@@ -1,0 +1,22 @@
+{
+  "name": "MI TV NETWORK - VOTING SYSTEM",
+  "short_name": "MI VOTING",
+  "description": "Official Digital Voting Platform by Maaz Iqbal (MI TV)",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#020205",
+  "theme_color": "#00f2ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

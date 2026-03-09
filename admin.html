@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MI ADMIN V2 | DIGITAL SUPREMACY</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00f2ff">
+<link rel="apple-touch-icon" href="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('MI PWA: Registered Success!', reg))
+        .catch(err => console.log('MI PWA: Register Failed!', err));
+    });
+  }
+</script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================
+           ADVANCED NEON THEME & UI ENGINE
+           ========================================== */
+        :root {
+            --neon-cyan: #00f2ff;
+            --neon-mag: #bc13fe;
+            --neon-red: #ff0055;
+            --neon-green: #00ff9d;
+            --bg-deep: #020205;
+            --glass-bg: rgba(10, 10, 18, 0.85);
+            --glass-border: rgba(0, 242, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+        }
+
+        /* --- LOGIC: DIGITAL GRID BACKGROUND --- */
+        body::before {
+            content: ""; position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px; z-index: -1; pointer-events: none;
+        }
+
+        /* --- 1. SUPREME LOCK SCREEN --- */
+        #admin-lock-screen {
+            position: fixed; inset: 0; background: #000; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .lock-container {
+            background: var(--glass-bg); padding: 50px; border-radius: 25px;
+            border: 1px solid var(--neon-cyan); text-align: center;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2); backdrop-filter: blur(20px);
+        }
+        .lock-logo { width: 100px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+        .pin-field {
+            background: #000; border: 2px solid var(--neon-mag); padding: 18px;
+            border-radius: 12px; color: var(--neon-cyan); font-size: 28px;
+            text-align: center; letter-spacing: 12px; width: 250px; outline: none; margin: 25px 0;
+            font-family: 'Orbitron', sans-serif; transition: 0.3s;
+        }
+        .pin-field:focus { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan); }
+
+        /* --- 2. DASHBOARD ANIMATIONS --- */
+        #admin-dashboard { display: none; padding: 25px; opacity: 0; }
+        
+        .header-main {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px; background: var(--glass-bg); border-radius: 20px;
+            border-left: 5px solid var(--neon-cyan); margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .header-title h1 { font-family: 'Orbitron', sans-serif; font-size: 22px; letter-spacing: 3px; }
+
+        /* --- 3. GRID & CARDS --- */
+        .admin-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px; margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--glass-bg); border-radius: 20px; padding: 30px;
+            border: 1px solid var(--glass-border); transition: 0.4s;
+            position: relative; overflow: hidden;
+        }
+        .card:hover { border-color: var(--neon-cyan); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 242, 255, 0.1); }
+        .card h2 { font-size: 16px; color: var(--neon-cyan); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+
+        /* --- 4. FORM ELEMENTS --- */
+        .field-group { margin-bottom: 20px; }
+        label { font-size: 11px; color: #888; margin-bottom: 8px; display: block; text-transform: uppercase; font-weight: 700; }
+        input, textarea, select {
+            width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid #222;
+            border-radius: 10px; color: #fff; outline: none; transition: 0.3s; font-size: 14px;
+        }
+        input:focus, textarea:focus { border-color: var(--neon-cyan); background: rgba(0,0,0,0.8); }
+
+        .btn-glow {
+            width: 100%; padding: 15px; border: none; border-radius: 10px;
+            font-weight: 900; letter-spacing: 2px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-cyan { background: var(--neon-cyan); color: #000; box-shadow: 0 5px 15px rgba(0, 242, 255, 0.3); }
+        .btn-mag { background: var(--neon-mag); color: #fff; box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); }
+        .btn-cyan:hover, .btn-mag:hover { filter: brightness(1.2); letter-spacing: 4px; }
+
+        /* --- 5. CONTENT MANAGER (Delete System) --- */
+        .content-list { max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        .list-item {
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
+            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid transparent; transition: 0.3s;
+        }
+        .list-item:hover { background: rgba(255,255,255,0.07); border-color: #333; }
+        .item-info h4 { font-size: 13px; color: var(--neon-cyan); }
+        .item-info p { font-size: 11px; color: #777; }
+        .del-btn { color: var(--neon-red); background: none; border: none; cursor: pointer; font-size: 18px; padding: 5px; }
+
+        /* --- 6. ADMIN CHAT HUB --- */
+        #admin-chat-area {
+            height: 400px; overflow-y: auto; background: rgba(0,0,0,0.3);
+            border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px inset #111;
+        }
+        .admin-chat-msg { margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #111; padding-bottom: 5px; }
+        .admin-chat-msg b { color: var(--neon-mag); }
+
+        /* --- 7. NOTIFICATION TOAST --- */
+        #notify {
+            position: fixed; bottom: 30px; right: 30px; padding: 15px 30px;
+            border-radius: 12px; background: var(--neon-green); color: #000;
+            font-weight: 800; transform: translateY(150%); transition: 0.5s; z-index: 100000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="admin-lock-screen">
+        <div class="lock-container">
+            <img src="https://i.ibb.co/Gvvxfc2C/IMG-20260307-182448-removebg-preview.png" class="lock-logo" alt="MI">
+            <h1 style="font-family: 'Orbitron'; font-size: 24px; color: #fff;">MI SYSTEM LOCK</h1>
+            <p style="font-size: 11px; color: var(--neon-cyan); margin-top: 10px;">AUTHORIZED PERSONNEL ONLY</p>
+            <input type="password" id="pin-input" class="pin-field" maxlength="6" placeholder="******">
+            <button class="btn-glow btn-cyan" onclick="unlockAdmin()">IDENTITY VERIFIED</button>
+        </div>
+    </div>
+
+    <div id="admin-dashboard">
+        
+        <header class="header-main">
+            <div class="header-title">
+                <h1>MI CONTROL <span style="color:var(--neon-mag)">V2.0</span></h1>
+                <p style="font-size: 10px; color: #777;">MASTER ADMIN: MAAZ IQBAL | NETWORK: MI TV</p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button onclick="clearChatData()" class="btn-glow btn-mag" style="padding: 8px 15px; font-size: 10px; width: auto;"><i class="fas fa-broom"></i> CLEAR CHAT</button>
+                <button onclick="location.reload()" style="background:none; border: 1px solid #444; color: #fff; cursor:pointer; padding: 5px 15px; border-radius: 8px;">LOGOUT</button>
+            </div>
+        </header>
+
+        <div class="admin-grid">
+            
+            <div class="card">
+                <h2><i class="fas fa-poll"></i> Launch Supreme Poll</h2>
+                <div class="field-group">
+                    <label>Main Image Link</label>
+                    <input type="text" id="p-img" placeholder="https://i.ibb.co/...">
+                </div>
+                <div class="field-group">
+                    <label>Post Description (Caption)</label>
+                    <textarea id="p-desc" rows="3" placeholder="Explain the poll details..."></textarea>
+                </div>
+                <div class="field-group">
+                    <label>The Question</label>
+                    <input type="text" id="p-ques" placeholder="Which one do you choose?">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="field-group" style="flex:1">
+                        <label>Option A</label>
+                        <input type="text" id="p-optA" placeholder="Player 1">
+                    </div>
+                    <div class="field-group" style="flex:1">
+                        <label>Option B</label>
+                        <input type="text" id="p-optB" placeholder="Player 2">
+                    </div>
+                </div>
+                <button class="btn-glow btn-cyan" onclick="handlePollPublish()"><i class="fas fa-paper-plane"></i> PUBLISH LIVE</button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-video"></i> Broadcast Media</h2>
+                <div class="field-group">
+                    <label>Media Title</label>
+                    <input type="text" id="m-title" placeholder="Important Video Update!">
+                </div>
+                <div class="field-group">
+                    <label>Video URL (YouTube/FB)</label>
+                    <input type="url" id="m-link" placeholder="Paste link here...">
+                </div>
+                <div class="field-group">
+                    <label>Description</label>
+                    <textarea id="m-desc" rows="3" placeholder="Tell users why to watch..."></textarea>
+                </div>
+                <button class="btn-glow btn-mag" onclick="handleMediaPublish()"><i class="fas fa-broadcast-tower"></i> START BROADCAST</button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-folder-open"></i> Manage Posts</h2>
+                <div class="field-group">
+                    <select id="manage-type" onchange="loadContentManager()">
+                        <option value="Polls">Active Polls</option>
+                        <option value="MediaAnnouncements">Media Posts</option>
+                    </select>
+                </div>
+                <div class="content-list" id="content-manager-list">
+                    <p style="text-align:center; color:#444; font-size:12px;">Select type to manage content</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-comments"></i> Admin Live Chat</h2>
+                <div id="admin-chat-area">
+                    </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="admin-msg-input" placeholder="Type as Admin..." style="flex: 1;">
+                    <button class="btn-glow btn-cyan" onclick="sendAdminMsg()" style="width: 60px;"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: span 1.5;">
+                <h2><i class="fas fa-database"></i> Live Integrity Monitor</h2>
+                <div style="overflow-x: auto;">
+                    <table style="width:100%; border-collapse: collapse; font-size: 12px;">
+                        <thead style="background: #111; color: var(--neon-cyan);">
+                            <tr>
+                                <th style="padding: 10px; text-align: left;">USER</th>
+                                <th style="padding: 10px; text-align: left;">CANDIDATE</th>
+                                <th style="padding: 10px; text-align: left;">TIMESTAMP</th>
+                                <th style="padding: 10px; text-align: left;">CONTROL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="votes-log-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-tachometer-alt"></i> Network Pulse</h2>
+                <div style="display: flex; justify-content: space-around; padding-top: 20px;">
+                    <div style="text-align: center;">
+                        <h1 id="stat-users" style="color: var(--neon-cyan); font-family: 'Orbitron';">0</h1>
+                        <p style="font-size: 10px; color: #888;">USERS</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h1 id="stat-votes" style="color: var(--neon-mag); font-family: 'Orbitron';">0</h1>
+                        <p style="font-size: 10px; color: #888;">TOTAL VOTES</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="notify">COMMAND EXECUTED!</div>
+
+    <script>
+        // --- 1. FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbnU8DkthpYQMHOLLyj6M0cc05qXfjMcw",
+            authDomain: "ramadan-2385b.firebaseapp.com",
+            databaseURL: "https://ramadan-2385b-default-rtdb.firebaseio.com",
+            projectId: "ramadan-2385b",
+            storageBucket: "ramadan-2385b.firebasestorage.app",
+            messagingSenderId: "882828936310",
+            appId: "1:882828936310:web:7f97b921031fe130fe4b57"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- 2. SECURITY ENGINE ---
+        function unlockAdmin() {
+            const pin = document.getElementById('pin-input').value;
+            if(pin === "123456") {
+                gsap.to("#admin-lock-screen", { 
+                    opacity: 0, scale: 1.5, duration: 0.8, ease: "power2.in", 
+                    onComplete: () => {
+                        document.getElementById('admin-lock-screen').style.display = 'none';
+                        document.getElementById('admin-dashboard').style.display = 'block';
+                        gsap.to("#admin-dashboard", { opacity: 1, duration: 1 });
+                        initializeSystem();
+                    }
+                });
+            } else {
+                alert("❌ ACCESS DENIED: SECURITY BREACH DETECTED!");
+                document.getElementById('pin-input').value = "";
+            }
+        }
+
+        // --- 3. PUBLISHING LOGIC ---
+        function handlePollPublish() {
+            const data = {
+                image: document.getElementById('p-img').value,
+                description: document.getElementById('p-desc').value,
+                question: document.getElementById('p-ques').value,
+                optionA: document.getElementById('p-optA').value,
+                optionB: document.getElementById('p-optB').value,
+                counts: { A: 0, B: 0 },
+                timestamp: Date.now()
+            };
+
+            if(!data.image || !data.question) { alert("Core fields missing!"); return; }
+
+            db.ref('Polls').push(data).then(() => {
+                showNotify("✅ POLL IS NOW LIVE!");
+                clearFields(['p-img', 'p-desc', 'p-ques', 'p-optA', 'p-optB']);
+            });
+        }
+
+        function handleMediaPublish() {
+            const data = {
+                title: document.getElementById('m-title').value,
+                link: document.getElementById('m-link').value,
+                desc: document.getElementById('m-desc').value,
+                timestamp: Date.now()
+            };
+
+            if(!data.title || !data.link) { alert("Title and Link are vital!"); return; }
+
+            db.ref('MediaAnnouncements').push(data).then(() => {
+                showNotify("🚀 MEDIA BROADCAST STARTED!");
+                clearFields(['m-title', 'm-link', 'm-desc']);
+            });
+        }
+
+        // --- 4. CONTENT MANAGEMENT (Delete System) ---
+        function loadContentManager() {
+            const type = document.getElementById('manage-type').value;
+            const listArea = document.getElementById('content-manager-list');
+            listArea.innerHTML = '<p style="text-align:center; font-size:10px;">Loading Digital Records...</p>';
+
+            db.ref(type).on('value', snap => {
+                listArea.innerHTML = '';
+                if(!snap.exists()) { listArea.innerHTML = '<p style="text-align:center; color:#555;">No Content Found.</p>'; return; }
+
+                snap.forEach(child => {
+                    const item = child.val();
+                    const id = child.key;
+                    const title = item.question || item.title || "Untitled Post";
+
+                    listArea.innerHTML += `
+                        <div class="list-item">
+                            <div class="item-info">
+                                <h4>${title}</h4>
+                                <p>ID: ${id}</p>
+                            </div>
+                            <button class="del-btn" onclick="deleteContent('${type}', '${id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function deleteContent(path, id) {
+            if(confirm("🚨 SYSTEM WARNING: This will permanently erase this record. Proceed?")) {
+                db.ref(`${path}/${id}`).remove().then(() => {
+                    showNotify("🗑️ RECORD ERASED!");
+                });
+            }
+        }
+
+        // --- 5. ADMIN CHAT MESSAGING ---
+        function sendAdminMsg() {
+            const input = document.getElementById('admin-msg-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            db.ref('GlobalChat').push({
+                uid: "ADMIN_MAAZ",
+                sender: "Admin Maaz",
+                isAdmin: true,
+                text: text,
+                timestamp: Date.now()
+            }).then(() => {
+                input.value = '';
+            });
+        }
+
+        function listenChat() {
+            const chatArea = document.getElementById('admin-chat-area');
+            db.ref('GlobalChat').limitToLast(20).on('child_added', snap => {
+                const msg = snap.val();
+                const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                chatArea.innerHTML += `
+                    <div class="admin-chat-msg">
+                        <small style="color:#555">${time}</small> <b>${msg.sender}:</b> ${msg.text}
+                    </div>
+                `;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            });
+        }
+
+        function clearChatData() {
+            if(confirm("🧹 Wipe entire chat history?")) {
+                db.ref('GlobalChat').remove().then(() => {
+                    document.getElementById('admin-chat-area').innerHTML = '';
+                    showNotify("✨ CHAT CLEANED!");
+                });
+            }
+        }
+
+        // --- 6. SYSTEM INITIALIZATION & STATS ---
+        function initializeSystem() {
+            loadContentManager(); // Default load
+            listenChat();
+
+            // Live Users Stat
+            db.ref('Users').on('value', snap => {
+                document.getElementById('stat-users').innerText = snap.numChildren();
+            });
+
+            // Live Vote Tracker
+            db.ref('Votes').on('value', snap => {
+                const body = document.getElementById('votes-log-body');
+                body.innerHTML = '';
+                let total = 0;
+
+                snap.forEach(poll => {
+                    poll.forEach(vote => {
+                        total++;
+                        const v = vote.val();
+                        body.innerHTML = `
+                            <tr style="border-bottom: 1px solid #111;">
+                                <td style="padding:10px;">${v.name}</td>
+                                <td style="padding:10px; color:var(--neon-mag)">${v.candidate}</td>
+                                <td style="padding:10px; color:#555">${new Date(v.time).toLocaleTimeString()}</td>
+                                <td style="padding:10px;"><button onclick="deleteVoteRecord('${poll.key}', '${vote.key}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-times-circle"></i></button></td>
+                            </tr>
+                        ` + body.innerHTML;
+                    });
+                });
+                document.getElementById('stat-votes').innerText = total;
+            });
+        }
+
+        function deleteVoteRecord(pid, vid) {
+            if(confirm("Delete this specific vote?")) {
+                db.ref(`Votes/${pid}/${vid}`).remove().then(() => showNotify("Vote Deleted!"));
+            }
+        }
+
+        // --- UTILITIES ---
+        function showNotify(msg) {
+            const n = document.getElementById('notify');
+            n.innerText = msg;
+            n.style.transform = "translateY(0)";
+            setTimeout(() => n.style.transform = "translateY(150%)", 3000);
+        }
+
+        function clearFields(ids) {
+            ids.forEach(id => document.getElementById(id).value = '');
+        }
+
+    </script>
+</body>
+</html>
